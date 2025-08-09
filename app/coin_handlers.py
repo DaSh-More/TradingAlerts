@@ -36,11 +36,11 @@ def long_short_handler(percent: float, timeframe: int):
             min_price = min(current_low, min_price)
 
         grow_p = max_growth / min_price
-        fall_p = -(max_fall / max_price)
+        fall_p = max_fall / max_price
         change = grow_p if percent > 0 else fall_p
 
         logger.info(f"{symbol.symbol} change {change}")
-        if abs(change) >= abs(percent):
+        if change >= abs(percent):
             if symbol.last_alert > 0:
                 symname = symbol.symbol.split(":")[0]
                 template = env.get_template("long_short_signal.jinja2")
