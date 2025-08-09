@@ -1,0 +1,6 @@
+__pycache__/
+test/
+.venv/
+.env
+users.json
+log.txt
