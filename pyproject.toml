@@ -28,6 +28,7 @@ dependencies = [
     "rich>=14.1.0",
     "scheduler",
     "scikit-learn>=1.7.1",
+    "tqdm>=4.67.1",
     "tradingview-api>=1.0.1",
     "tradingview-screener>=3.0.0",
 ]

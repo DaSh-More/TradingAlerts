@@ -1,0 +1,5 @@
+{{symname}} oi {% if change > 0 %}📈 \+{% else %}📉 \-{% endif %}{{ (change * 100) | round(1) | replace(".", "\.")}}%
+
+[Coinglass](https://www.coinglass.com/tv/Binance_{{ symname | replace("/", "") }})
+[Bybit](https://www.bybitglobal.com/trade/usdt/{{ symname | replace("/", "") }})
+[Binance](https://www.binance.com/ru/futures/{{ symname | replace("/", "") }})

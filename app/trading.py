@@ -10,23 +10,38 @@ class Symbol:
         self.symbol = symbol
         self.exchange = exchange
         self.candles = []
+        self.open_interest = []
         self.candles_limit = 500
 
-    async def get_old_candles(self):
+    async def get_history_data(self):
         try:
+            # Получаем исторические свечи
             self.candles = await self.exchange.fetch_ohlcv(
                 self.symbol, "1m", limit=self.candles_limit
             )
+            await self.__get_oi()
+
         except Exception as e:
-            logger.error(e)
+            logger.error(f"{self.symbol}: {e}")
+
+    async def __get_oi(self):
+        data = await self.exchange.fetch_open_interest_history(
+            self.symbol, "5m", limit=self.candles_limit // 5
+        )
+        self.open_interest = [oi["openInterestValue"] for oi in (data)]
 
     async def update(self):
         try:
-            candle = (await self.exchange.watch_ohlcv(self.symbol, "1m"))[0]
+            # Обновляем свечи
+            candle = (await self.exchange.fetch_ohlcv(self.symbol, "1m"))[0]
             if self.candles[-1] != candle:
                 self.candles.append(candle)
                 self.candles.pop(0)
-                return True
+
+            # Пытаемся обновить открытый интерес
+            await self.__get_oi()
+
+            return True
         except Exception as e:
             logger.error(e)
 
@@ -41,10 +56,11 @@ class Controller:
         self.__handlers = []
 
     async def init(self):
-        tasks = [sym.get_old_candles() for sym in self.symbols]
+        tasks = [sym.get_history_data() for sym in self.symbols]
         await asyncio.gather(*tasks)
 
     async def update(self):
+        logger.info("updated")
         updates = await asyncio.gather(*[sym.update() for sym in self.symbols])
         if not any(updates):
             logger.warning("no updates")
