@@ -1,10 +1,11 @@
 import asyncio
 from math import ceil
 
-from bot import send_signal
 from jinja2 import Environment, FileSystemLoader
 from loguru import logger
-from trading import Symbol
+
+from .bot import send_signal
+from .trading import Symbol
 
 env = Environment(loader=FileSystemLoader("./app/templates"))
 
@@ -14,15 +15,15 @@ def get_change_price(symbol: Symbol, timeframe: int):
     # Ищем максимальный рост за последние {timeframe} минут
     # o, h, l, c, v = zip(*candles)
 
-    max_price = candles[0][1]  # начальный максимум
-    min_price = candles[0][2]  # начальный минимум
+    max_price = candles[0][2]  # начальный максимум
+    min_price = candles[0][3]  # начальный минимум
 
     max_growth = 0
     max_fall = 0
 
     for candle in candles:
-        current_high = candle[1]
-        current_low = candle[2]
+        current_high = candle[2]
+        current_low = candle[3]
 
         # Обновляем максимальный рост, если current_high - min_price > рекорда
         potential_growth = current_high - min_price

@@ -4,3 +4,5 @@ test/
 .env
 users.json
 log.txt
+logs/
+test.ipynb

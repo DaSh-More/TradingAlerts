@@ -1,4 +1,5 @@
 import asyncio
+import json
 from types import CoroutineType
 
 from ccxt.base.exchange import Exchange
@@ -11,7 +12,7 @@ class Symbol:
         self.exchange = exchange
         self.candles = []
         self.open_interest = []
-        self.candles_limit = 500
+        self.candles_limit = 60
 
     async def get_history_data(self):
         try:
@@ -40,10 +41,15 @@ class Symbol:
 
             # Пытаемся обновить открытый интерес
             await self.__get_oi()
+            self.dump()
 
             return True
         except Exception as e:
             logger.error(e)
+
+    def dump(self):
+        with open(f"./app/logs/{self.symbol.split('/')[0]}.json", "w") as f:
+            json.dump({"oi": self.open_interest, "candles": self.candles}, f)
 
     def __repr__(self):
         return f"<Symbol [{self.symbol}]>"

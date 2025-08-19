@@ -16,7 +16,7 @@ bot = Bot(token=config.get("bot_token"))
 # dp = Dispatcher()
 
 
-async def send_signal(text: str):
+async def send_signal(text: str, users:dict):
     tasks = []
     for user in users.keys():
         tasks.append(
