@@ -41,7 +41,7 @@ class Symbol:
 
             # Пытаемся обновить открытый интерес
             await self.__get_oi()
-            self.dump()
+            # self.dump()
 
             return True
         except Exception as e:

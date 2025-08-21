@@ -25,7 +25,7 @@ async def main():
     markets = await exchange.load_markets()
     df = pd.DataFrame(markets).T.reset_index(drop=True)
     symbols = df[(df["type"] == "swap") & df["active"]]["symbol"].tolist()
-    symbols = (await sort_symbols(exchange, symbols))[:100]
+    symbols = (await sort_symbols(exchange, symbols))[:300]
 
     logger.info(f"finding {len(symbols)} symbols")
 
