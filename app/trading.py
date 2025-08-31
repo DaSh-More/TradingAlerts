@@ -29,7 +29,10 @@ class Symbol:
         data = await self.exchange.fetch_open_interest_history(
             self.symbol, "5m", limit=self.candles_limit // 5
         )
-        self.open_interest = [oi["openInterestValue"] for oi in (data)]
+        if not [oi["openInterestAmount"] for oi in (data)][0]:
+            logger.error(f"<{self.symbol}> OI don't load!")
+            raise ValueError
+        self.open_interest = [oi["openInterestAmount"] for oi in (data)]
 
     async def update(self):
         try:

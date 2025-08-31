@@ -5,4 +5,4 @@ test/
 users.json
 log.txt
 logs/
-test.ipynb
+test.*

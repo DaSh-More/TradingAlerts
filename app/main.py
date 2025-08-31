@@ -1,6 +1,5 @@
 import asyncio
 import datetime as dt
-import json
 
 import ccxt.pro as ccxtpro
 import pandas as pd
@@ -21,7 +20,7 @@ async def sort_symbols(exchange, symbols: list[str]):
 
 
 async def main():
-    exchange = ccxtpro.binance()
+    exchange = ccxtpro.bybit()
     markets = await exchange.load_markets()
     df = pd.DataFrame(markets).T.reset_index(drop=True)
     symbols = df[(df["type"] == "swap") & df["active"]]["symbol"].tolist()
