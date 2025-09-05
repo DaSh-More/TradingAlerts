@@ -1,0 +1,8 @@
+{%if is10oi%}✅{%else%}❌{%endif%} OI 10min: {{(oi10 * 100) | round(1) | replace(".", "\.")}}
+{%if is20oi%}✅{%else%}❌{%endif%} OI 20min: {{(oi20 * 100) | round(1) | replace(".", "\.")}}
+{%if is10price%}✅{%else%}❌{%endif%} Price 10min: {{(price10 * 100) | round(1) | replace(".", "\.")}}
+{%if is20price%}✅{%else%}❌{%endif%} Price 20min: {{(price20 * 100) | round(1) | replace(".", "\.")}}
+
+[Coinglass](https://www.coinglass.com/tv/Binance_{{ symname | replace("/", "") }})
+[Bybit](https://www.bybitglobal.com/trade/usdt/{{ symname | replace("/", "") }})
+[Binance](https://www.binance.com/ru/futures/{{ symname | replace("/", "") }})

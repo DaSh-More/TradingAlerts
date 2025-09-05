@@ -5,6 +5,8 @@ from types import CoroutineType
 from ccxt.base.exchange import Exchange
 from loguru import logger
 
+from .db import DB
+
 
 class Symbol:
     def __init__(self, symbol: str, exchange: Exchange):
@@ -59,8 +61,9 @@ class Symbol:
 
 
 class Controller:
-    def __init__(self, symbols: list[str], exchange: Exchange):
+    def __init__(self, symbols: list[str], exchange: Exchange, db:DB):
         self.exchange = exchange
+        self.db = db
         self.symbols: list[Symbol] = [Symbol(s, exchange) for s in symbols]
         self.__handlers = []
 
@@ -78,7 +81,7 @@ class Controller:
         for handler in self.__handlers:
             logger.info(f"Check handler '{handler['title']}'")
             for symbol in self.symbols:
-                res = handler["func"](symbol)
+                res = handler["func"](symbol, self.db)
                 if isinstance(res, CoroutineType):
                     tasks.append(res)
         await asyncio.gather(*tasks)

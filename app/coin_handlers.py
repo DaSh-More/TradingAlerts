@@ -1,17 +1,19 @@
 import json
 from math import ceil
 
-from bot import send_signal
 from jinja2 import Environment, FileSystemLoader
 from loguru import logger
-from trading import Symbol
+
+from .bot import send_signal
+from .db import DB
+from .trading import Symbol
 
 env = Environment(loader=FileSystemLoader("./app/templates"))
 with open("./app/users.json") as f:
     users = json.load(f)
 
 
-def get_change_price(symbol: Symbol, timeframe: int):
+def get_change_price(symbol: Symbol, timeframe: int, *_):
     candles = symbol.candles[-timeframe:]
     # Ищем максимальный рост за последние {timeframe} минут
     # o, h, l, c, v = zip(*candles)
@@ -40,7 +42,7 @@ def get_change_price(symbol: Symbol, timeframe: int):
     return max_growth, max_fall
 
 
-def price_up_down_handler(percent: float, timeframe: int):
+def price_up_down_handler(percent: float, timeframe: int, *_):
     async def func(symbol: Symbol):
         # Ищем максимальный рост за последние {timeframe} минут
         # o, h, l, c, v = zip(*candles)
@@ -61,7 +63,7 @@ def price_up_down_handler(percent: float, timeframe: int):
     return func
 
 
-def get_oi_change(symbol: Symbol, timeframe: int):
+def get_oi_change(symbol: Symbol, timeframe: int, *_):
     if not symbol.open_interest:
         logger.warning(f"Symbol [{symbol.symbol}] don't has OI!")
         return 0, 0
@@ -89,7 +91,7 @@ def get_oi_change(symbol: Symbol, timeframe: int):
     return max_growth, max_fall
 
 
-def oi_up_down_handler(percent: float, timeframe: int):
+def oi_up_down_handler(percent: float, timeframe: int, *_):
     async def func(symbol: Symbol):
         grow_p, fall_p = get_oi_change(percent, timeframe)
         change = grow_p if percent > 0 else fall_p
@@ -108,7 +110,7 @@ def oi_up_down_handler(percent: float, timeframe: int):
     return func
 
 
-async def main_pattern_handler(symbol: Symbol):
+async def main_pattern_handler(symbol: Symbol, db: DB):
     """
     1 | Проверяешь, выросла ли цена
 
@@ -132,6 +134,10 @@ async def main_pattern_handler(symbol: Symbol):
     is_price_up_20 = price_up_20 >= 0.07
     is_oi_up_10 = oi_up_10 >= 0.02
     is_oi_up_20 = oi_up_20 >= 0.04
+    
+    if is_signal := (is_price_up_10 + is_price_up_20 + is_oi_up_10 + is_oi_up_20):
+        template = env.get_template("pattern_signal_bd.jinja2")
+        db.add_alert(symbol.symbol, template.render, 'green' if is_signal == 4 else "white")
 
     if is_price_up_10 + is_price_up_20 + is_oi_up_10 + is_oi_up_20 >= 3:
         logger.info(f"{symbol.symbol} - main_pattern")
