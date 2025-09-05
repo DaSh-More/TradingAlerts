@@ -3,12 +3,12 @@ import datetime as dt
 
 import ccxt.pro as ccxtpro
 import pandas as pd
-from coin_handlers import main_pattern_handler
 from loguru import logger
 from scheduler.asyncio import Scheduler
-from trading import Controller
 
+from .coin_handlers import main_pattern_handler
 from .db import DB
+from .trading import Controller
 
 logger.add("log.txt", rotation="10MB")
 
