@@ -134,10 +134,23 @@ async def main_pattern_handler(symbol: Symbol, db: DB):
     is_price_up_20 = price_up_20 >= 0.07
     is_oi_up_10 = oi_up_10 >= 0.02
     is_oi_up_20 = oi_up_20 >= 0.04
-    
+
     if is_signal := (is_price_up_10 + is_price_up_20 + is_oi_up_10 + is_oi_up_20):
         template = env.get_template("pattern_signal_db.jinja2")
-        db.add_alert(symbol.symbol, template.render, 'green' if is_signal == 4 else "white")
+        db.add_alert(
+            symbol.symbol,
+            template.render(
+                oi10=oi_up_10,
+                oi20=oi_up_20,
+                price10=price_up_10,
+                price20=price_up_20,
+                is10oi=is_oi_up_10,
+                is20oi=is_oi_up_20,
+                is10price=is_price_up_10,
+                is20price=is_price_up_20,
+            ),
+            "green" if is_signal == 4 else "white",
+        )
 
     if is_price_up_10 + is_price_up_20 + is_oi_up_10 + is_oi_up_20 >= 3:
         logger.info(f"{symbol.symbol} - main_pattern")
